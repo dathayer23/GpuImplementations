@@ -22,6 +22,7 @@ using WilburEllis.RisingTide.Services.ControllerWindowsService;
 using WilburEllis.RisingTide.Services.Common.Services;
 using WilburEllis.RisingTide.Spatial.Imaging;
 using WilburEllis.RisingTide.Spatial.Interpolation.Algorithm;
+using WilburEllis.RisingTide.Spatial.Interpolation;
 
 namespace GpuInterpolation
 {
@@ -46,7 +47,31 @@ namespace GpuInterpolation
             InterpolateKernel = ctx.LoadKernelPTX(resName, "RasterInterpolate");
         }
 
-        public RtRaster<double> RunInterpolation(YieldReportData dataPoints, IGeometry dataBoundary)
+        public RtRaster<double> RunCpuInterpolation(YieldReportData dataPoints, IGeometry dataBoundary)
+        {
+            var bounds = new RTBounds(dataBoundary).ToMeters();
+            var xMax = bounds.MaxX;
+            var xMin = bounds.MinX;
+            var yMax = bounds.MaxY;
+            var yMin = bounds.MinY;
+
+            CollectionStats yld = dataPoints.YieldData.Yield;
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            var ip = new Interpolator();
+            var raster =  ip.OldInterpolate(yld.data.Select(v => new RtPointZ(v.X, v.Y, (float)v.Z)).ToList(), xMin, xMax, yMin, yMax, 0.0f, 4, 1, 1.0f, 1.0f);
+
+            //var raster = CommonServices.CreateHeatMap(yld.data.Select(v => new RtPointZ(v.X,v.Y,(float)v.Z)).ToList(), xMin,yMin,xMax,yMax);
+            timer.Stop();
+            var elapsed = timer.ElapsedTicks;
+            Console.WriteLine("Cpu Interpolation took {0} ms", elapsed / (Stopwatch.Frequency / 1000));
+
+            RtRaster<double> rasterDbl = new RtRaster<double>(raster.NumCols, raster.NumRows, raster.Xll, raster.Yll, 1.0, 1);
+            rasterDbl.SetRasterBand(0, raster.Bands[0].TransformDataBand(v => (double)v));
+            return rasterDbl;
+        }
+
+        public RtRaster<double> RunGpuInterpolation(YieldReportData dataPoints, IGeometry dataBoundary)
         {
             try
             {
@@ -61,7 +86,7 @@ namespace GpuInterpolation
                 //var cost = (xDist * yDist * dataPoints.Count) / (Environment.ProcessorCount * cellSize * cellSize);
                 var nCols = xDist / cellSize;
                 var nRows = yDist / cellSize;
-                var cols = Enumerable.Range(0, nCols - 1).ToArray();
+                
                 CollectionStats yld = dataPoints.YieldData.Yield;
                 //create host side arrays for input data and boundary and output data
                 double[] h_datax = yld.DataPoints.Select(pt => RtPoint<double>.LatLonToMeters(pt)).Select(ptz => ptz.X).ToArray();
@@ -70,6 +95,7 @@ namespace GpuInterpolation
 
                 var dataSize = sizeof(double) * h_datax.Length;
                 Console.WriteLine("Performing interpolation on {0} data points of {1} bytes", h_datax.Length, dataSize);
+                var cols = Enumerable.Range(0, nCols - 1).ToArray();
                 var coords = Enumerable.Range(0, nRows).SelectMany(row => cols.Select(col => Tuple.Create(row, col))).ToArray();
                 double[] h_outputx = coords.Select(coord => xMin + (coord.Item2 * cellSize)).ToArray();
                 double[] h_outputy = coords.Select(coord => yMin + (coord.Item1 * cellSize)).ToArray();
@@ -110,7 +136,7 @@ namespace GpuInterpolation
                     Console.WriteLine("Kernel failed");
                 }
 
-                var raster = new RtRaster<double>(nCols, nRows, xMin, yMin, cellSize);
+                var raster = new RtRaster<double>(nCols, nRows, xMin, yMin, cellSize * 2);
                 var noDataValue = 0.0f;
                 var rasterBand = RtRasterBand<double>.CreateRasterBand(typeof(double), nCols, nRows, noDataValue, h_outputz);
                 raster.SetRasterBand(0, rasterBand);
@@ -134,25 +160,28 @@ namespace GpuInterpolation
 
         }
 
-        public void SaveResults(RtRaster<double> raster, IControllerDataService dataService)
+        
+
+        public void SaveResults(RtRaster<double> raster, IControllerDataService dataService, string name)
         {
             var res = CalculateHeatmap.GeneratePaletteAndHistogramForData(dataService, raster);
-            SaveRasterToFile(raster, res.Item1);
+            SaveRasterToFile(raster, res.Item1, name);
         }
 
-        private void SaveRasterToFile(RtRaster<double> raster, RtColorPalette palette)
-        {            
+        private void SaveRasterToFile(RtRaster<double> raster, RtColorPalette palette, string name)
+        {
+            //raster.CellSize = 2;
             var bmpAndPalette = GetRasterBitmap(raster, palette);
             Bitmap bmp = bmpAndPalette.Item1;
 
-            bmp.Save(@"C:\AgVerdict\Gpu\GpuRaster.png", ImageFormat.Png);
+            bmp.Save(name, ImageFormat.Png);
         }
 
         private Tuple<Bitmap, RtColorPalette> GetRasterBitmap(RtRaster<double> raster, RtColorPalette palette)
         {            
             if (palette != null)
             {
-                var image = raster.ToImage(palette, Color.Aqua);
+                var image = raster.ToImage(palette, Color.AntiqueWhite);
                 return Tuple.Create(image, palette);
             }
 

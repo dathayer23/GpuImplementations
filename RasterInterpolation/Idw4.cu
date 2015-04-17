@@ -21,14 +21,29 @@ extern "C"  {
 #define VT  4
 	__device__ double distance(double dx, double dy)
 	{
-		//if (dx != 0.0 && dy != 0.0)
+		if (dx != 0.0 && dy != 0.0)
 			return (dx) * (dx) + (dy) * (dy);
-		//return 1.0;
+		return 1.0;
+	}
+#ifdef CUDA_3_5
+	// dynamic parallelism function call
+	__device__  Idw4Item(const double * data_x, const double * data_y, const double * data_z, double * output, const double x, const double y, int N)
+	{
+		int i = blockDim.x * blockIdx.x + threadIdx.x * VT;
+		if (i < N)
+		{
+			double d = distance((data_x[i] - x), (data_y[i] - y));
+			output[i] = data_z[i] / d * d;
+		}
 	}
 
+	__device__ double * data_output;
+#endif
 	__device__ double Idw4(const double * data_x, const double * data_y, const double * data_z, const double x, const double y, double z, int N)
 	{
+		//cudaMalloc()
 		double d = 0.0;
+		#pragma unroll
 		for (int i = 0; i < N; i++)
 		{			
 			d = distance((data_x[i] - x), (data_y[i] - y)); // square of euclidian distance

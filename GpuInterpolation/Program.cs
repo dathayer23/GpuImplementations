@@ -35,9 +35,14 @@ namespace GpuInterpolation
             YieldReportData yieldData = _dbService.GetYieldReport(1862, false, false);
             var boundary = _dbService.GetFieldBoundary(yieldData.FieldId);
             //var data = yieldData.YieldData.Yield.data;
-            Console.WriteLine("Call interpolation function");
-            var raster = interpolater.RunInterpolation(yieldData, boundary);
-            interpolater.SaveResults(raster, _dbService);
+            Console.WriteLine("Call GPU interpolation function");
+            var raster = interpolater.RunGpuInterpolation(yieldData, boundary);
+            interpolater.SaveResults(raster, _dbService, @"C:\AgVerdict\Gpu\GpuRaster.png");
+            Console.WriteLine("Saving output to image file");
+
+            Console.WriteLine("Call CPU interpolation function");
+            raster = interpolater.RunCpuInterpolation(yieldData, boundary);
+            interpolater.SaveResults(raster, _dbService, @"C:\AgVerdict\Gpu\CpuRaster.png");
             Console.WriteLine("Saving output to image file");
             Console.WriteLine("press any key to exit ...");
             Console.ReadKey();

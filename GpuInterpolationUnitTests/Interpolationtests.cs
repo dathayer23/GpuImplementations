@@ -24,7 +24,7 @@ namespace GpuInterpolationUnitTests
             YieldReportData yieldData = _dbService.GetYieldReport(1862, false, false);
             var boundary = _dbService.GetFieldBoundary(yieldData.FieldId);
             //var data = yieldData.YieldData.Yield.data;
-            interpolater.RunInterpolation(yieldData, boundary);
+            interpolater.RunGpuInterpolation(yieldData, boundary);
         }
     }
 }
