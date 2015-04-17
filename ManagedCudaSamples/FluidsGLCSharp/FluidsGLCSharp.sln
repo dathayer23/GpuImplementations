@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluidsGLCSharp", "FluidsGLCSharp.csproj", "{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F} = {FF524DC4-99A7-4045-B5EB-D453FDC8032F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kernels", "Kernels\Kernels.vcxproj", "{FF524DC4-99A7-4045-B5EB-D453FDC8032F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
+		Debug|x86 = Debug|x86
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Debug|Win32.ActiveCfg = Debug|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Debug|x86.ActiveCfg = Debug|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Debug|x86.Build.0 = Debug|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Release|Mixed Platforms.Build.0 = Release|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Release|Win32.ActiveCfg = Release|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Release|x86.ActiveCfg = Release|x86
+		{EF2A21F6-3E9E-4291-B31B-FEE217BCE692}.Release|x86.Build.0 = Release|x86
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Debug|Win32.Build.0 = Debug|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Debug|x86.ActiveCfg = Debug|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Release|Win32.ActiveCfg = Release|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Release|Win32.Build.0 = Release|Win32
+		{FF524DC4-99A7-4045-B5EB-D453FDC8032F}.Release|x86.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
